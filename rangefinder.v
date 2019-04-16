@@ -6,11 +6,9 @@ module rangefinder(input wire clock,
 wire[45:0] times;
 wire[12:0] distance;
 
-
-
 timecount my_time(clock, trigger, echo, times);
-converter convrt(clock, times, distance);
-ledPrint print(clock, distance, led_count);
+converter convrt (clock, times, distance);
+ledPrint print   (clock, distance, led_count);
 
 
 
@@ -18,9 +16,9 @@ endmodule
 
 
 
-module timecount(input wire clock,
+module timecount(input  wire clock,
                  output wire trigger,
-					  input wire echo,
+					  input  wire echo,
 					  output wire[45:0] times);
 
 	
@@ -63,35 +61,60 @@ begin
 end
 endmodule
 
-module converter(input wire clock,
-                 input wire[45:0] times,
+module converter(input  wire clock,
+                 input  wire[45:0] times,
 					  output wire[12:0] distance);
 					 
 reg[12:0] distance_reg;
-
+wire[45:0] distance_wire;
 assign distance = distance_reg;
-
+assign distance_wire = (times * 9'd343)/(2'd2 * 16'd50000);
 
 
 always @(posedge clock)
 begin
-    distance_reg <= (times * 9'd343)/(2'd2 * 16'd50000);
+    distance_reg <= distance_wire[12:0];
 end
 endmodule
 
-module ledPrint(input wire clock,
-                input wire[12:0] distance,
-                output wire[7:0] led_count);
+module ledPrint(input  wire clock,
+                input  wire[12:0] distance,
+                output wire[7:0]  led_count);
 					 
-reg[7:0] led_count_regg;
-initial led_count_regg <= 8'b00000001;
+reg[7:0] led_reg;
+initial led_reg <= 8'b00000000;
 
 
 always @(posedge clock)
 begin
-    led_count_regg <= distance[7:0];
+	led_reg <= 8'h00;
+	if (distance[7:0] > 1*10) begin
+      led_reg[0] <= 1'b1;
+   end 
+	if (distance[7:0] > 2*10) begin
+      led_reg[1] <= 1'b1;
+   end
+	if (distance[7:0] > 3*10) begin
+      led_reg[2] <= 1'b1;
+   end
+	if (distance[7:0] > 4*10) begin
+      led_reg[3] <= 1'b1;
+   end
+	if (distance[7:0] > 5*10) begin
+      led_reg[4] <= 1'b1;
+   end
+	if (distance[7:0] > 6*10) begin
+      led_reg[5] <= 1'b1;
+   end
+	if (distance[7:0] > 7*10) begin
+      led_reg[6] <= 1'b1;
+   end
+	if (distance[7:0] > 8*10) begin
+      led_reg[7] <= 1'b1;
+   end
+	
 end 
 
-assign led_count = led_count_regg;					 
+assign led_count = led_reg;					 
 					 
 endmodule	
